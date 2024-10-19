@@ -1,9 +1,13 @@
+import { useMemo } from "react";
 import "./App.css";
 import Chat from "./components/Chat";
 import Feed from "./components/Feed";
 import Navbar from "./components/Navbar";
 
 function App() {
+    const socket = useMemo(() => {
+        return new WebSocket("ws://localhost:3000");
+    }, []);
     /* From Uiverse.io by gharsh11032000 */
     return (
         <>
@@ -14,19 +18,9 @@ function App() {
                 <div className="app-container">
                     <Feed />
                     <Chat
-                        messages={[
-                            { message: "hola", from: "Ivan", isLocal: true },
-                            {
-                                message: "como estas",
-                                from: "Ian",
-                                isLocal: false,
-                            },
-                            {
-                                message: "Bien bien",
-                                from: "Ivan",
-                                isLocal: true,
-                            },
-                        ]}
+                        socket={socket}
+                        chatWithProp="client"
+                        isAssignedProp={true}
                     />
                 </div>
             </div>

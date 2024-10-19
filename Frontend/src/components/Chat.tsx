@@ -1,28 +1,41 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import ChatMessage from "./chatComponents/ChatMessage";
-import pingToServer from "../scripts/pingToServer";
 import MessageObject from "../interfaces/MessageObject";
-import trySendMessage from "../scripts/trySendMessage";
-import connectWSToServer from "../scripts/connectWSToServer";
+import sendMessage from "../scripts/sendMessage";
+import receiveMessage from "../scripts/receiveMessage";
 
 interface Props {
-    messages: MessageObject[] | null;
+    socket: WebSocket;
+    chatWithProp: string | undefined;
+    isAssignedProp: boolean;
 }
 
-export default function Chat({ messages }: Props) {
+export default function Chat({ socket, chatWithProp, isAssignedProp }: Props) {
     const [isAssigned, setIsAssigned] = useState(false); // To know if there are messages to show
+    if (isAssignedProp != isAssigned) setIsAssigned(isAssignedProp); // If different, change the state
+
     const [chatWith, setChatWith] = useState("no one");
+    if (chatWith != chatWithProp)
+        setChatWith(chatWithProp ? chatWithProp : "no one"); // Change the subject of the chat if different
 
-    // Determine, by the given list of messages, if there are something yo show
-    const areMessages = messages == null ? false : messages.length > 0;
+    const [messageWritten, setMessageWritten] = useState(""); // Keep track of the text
 
-    // Change the state only if it's needed, to prevent an infinite loop!
-    if (areMessages != isAssigned) setIsAssigned(areMessages);
+    const [messageList, setMessageList] = useState<MessageObject[]>([]);
+
+    useEffect(() => {
+        // Set the connection to listen to incoming messages
+        receiveMessage(socket, (message: MessageObject) => {
+            console.log("setting the new message list");
+
+            const newMessageList = messageList.concat([message]);
+            setMessageList(newMessageList);
+        });
+    });
 
     // If there are messages, map each to a ChatMessage component
     const chatMessageComponents = [<></>];
-    if (isAssigned && messages != null) {
-        messages.forEach((message) => {
+    if (isAssigned && messageList != null) {
+        messageList.forEach((message) => {
             chatMessageComponents.push(
                 <ChatMessage
                     message={message.message}
@@ -42,11 +55,6 @@ export default function Chat({ messages }: Props) {
         </div>
     );
 
-    let socket = undefined;
-    const connectToServer = () => {
-        socket = connectWSToServer();
-    };
-
     return (
         <>
             <div className="chat-body">
@@ -57,19 +65,34 @@ export default function Chat({ messages }: Props) {
                     <div className="chat-message-space">{messageContainer}</div>
                     <div className="chat-write-box">
                         <div className="write-box-textfield">
-                            <input type="text" name="message" id="message" />
+                            <input
+                                type="text"
+                                name="message"
+                                id="message-input"
+                                onChange={(event) => {
+                                    // Handle the change in the written message
+                                    setMessageWritten(event.target.value);
+                                }}
+                            />
                         </div>
                         <div className="write-box-send-button">
-                            <button type="button" onClick={connectToServer}>
-                                Send
-                            </button>
                             <button
                                 type="button"
-                                onClick={trySendMessage(
-                                    socket ? socket : undefined
-                                )}
+                                onClick={() => {
+                                    // Send the message
+                                    console.log(
+                                        "message to be sent: ",
+                                        messageWritten
+                                    );
+
+                                    sendMessage(socket, {
+                                        message: messageWritten,
+                                        from: "me",
+                                        isLocal: true,
+                                    });
+                                }}
                             >
-                                Send message to server
+                                Send
                             </button>
                         </div>
                     </div>

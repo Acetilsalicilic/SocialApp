@@ -8,13 +8,16 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
 
-wss.on("connection", (socket) => {
+let socket;
+
+wss.on("connection", (newSocket) => {
     console.log("Someone connected");
+    socket = newSocket;
 
     socket.on("message", (data) => {
         console.log("received message");
 
-        receiveMessage(data.toString());
+        receiveMessage(data.toString(), socket);
     });
 });
 
