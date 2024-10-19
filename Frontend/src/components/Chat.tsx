@@ -1,13 +1,12 @@
 import { useState } from "react";
 import ChatMessage from "./chatComponents/ChatMessage";
 import pingToServer from "../scripts/pingToServer";
-interface messageObject {
-    message: string;
-    from: string;
-    isLocal: boolean;
-}
+import MessageObject from "../interfaces/MessageObject";
+import trySendMessage from "../scripts/trySendMessage";
+import connectWSToServer from "../scripts/connectWSToServer";
+
 interface Props {
-    messages: messageObject[] | null;
+    messages: MessageObject[] | null;
 }
 
 export default function Chat({ messages }: Props) {
@@ -43,6 +42,11 @@ export default function Chat({ messages }: Props) {
         </div>
     );
 
+    let socket = undefined;
+    const connectToServer = () => {
+        socket = connectWSToServer();
+    };
+
     return (
         <>
             <div className="chat-body">
@@ -56,8 +60,16 @@ export default function Chat({ messages }: Props) {
                             <input type="text" name="message" id="message" />
                         </div>
                         <div className="write-box-send-button">
-                            <button type="button" onClick={pingToServer}>
+                            <button type="button" onClick={connectToServer}>
                                 Send
+                            </button>
+                            <button
+                                type="button"
+                                onClick={trySendMessage(
+                                    socket ? socket : undefined
+                                )}
+                            >
+                                Send message to server
                             </button>
                         </div>
                     </div>
