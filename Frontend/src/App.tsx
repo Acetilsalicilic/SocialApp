@@ -13,7 +13,21 @@ function App() {
                 </div>
                 <div className="app-container">
                     <Feed />
-                    <Chat />
+                    <Chat
+                        messages={[
+                            { message: "hola", from: "Ivan", isLocal: true },
+                            {
+                                message: "como estas",
+                                from: "Ian",
+                                isLocal: false,
+                            },
+                            {
+                                message: "Bien bien",
+                                from: "Ivan",
+                                isLocal: true,
+                            },
+                        ]}
+                    />
                 </div>
             </div>
         </>
