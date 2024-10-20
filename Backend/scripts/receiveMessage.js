@@ -1,4 +1,4 @@
-export default async function receiveMessage(data, socket) {
+export default async function receiveMessage(data, socketList) {
     console.log("doing the parse");
 
     const json = await JSON.parse(data);
@@ -7,13 +7,15 @@ export default async function receiveMessage(data, socket) {
         console.log("new message");
         console.log(json.message);
 
-        console.log("sending");
+        console.log("sending to all");
 
-        socket.send(
-            JSON.stringify({
-                type: "incoming-message",
-                message: json.message,
-            })
-        );
+        socketList.forEach(({ username, socket }) => {
+            socket.send(
+                JSON.stringify({
+                    type: "incoming-message",
+                    message: json.message,
+                })
+            );
+        });
     }
 }

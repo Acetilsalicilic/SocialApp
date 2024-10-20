@@ -6,7 +6,7 @@ import Navbar from "./components/Navbar";
 
 function App() {
     const socket = useMemo(() => {
-        return new WebSocket("ws://localhost:3000");
+        return new WebSocket("ws://localhost:3000?username=first-client");
     }, []);
     /* From Uiverse.io by gharsh11032000 */
     return (
