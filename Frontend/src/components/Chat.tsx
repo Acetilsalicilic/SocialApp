@@ -8,9 +8,15 @@ interface Props {
     socket: WebSocket;
     chatWithProp: string | undefined;
     isAssignedProp: boolean;
+    username: string;
 }
 
-export default function Chat({ socket, chatWithProp, isAssignedProp }: Props) {
+export default function Chat({
+    socket,
+    chatWithProp,
+    isAssignedProp,
+    username,
+}: Props) {
     const [isAssigned, setIsAssigned] = useState(false); // To know if there are messages to show
     if (isAssignedProp != isAssigned) setIsAssigned(isAssignedProp); // If different, change the state
 
@@ -87,8 +93,9 @@ export default function Chat({ socket, chatWithProp, isAssignedProp }: Props) {
 
                                     sendMessage(socket, {
                                         message: messageWritten,
-                                        from: "me",
+                                        from: username,
                                         isLocal: true,
+                                        to: chatWith,
                                     });
                                 }}
                             >

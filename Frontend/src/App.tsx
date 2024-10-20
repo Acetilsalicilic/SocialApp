@@ -4,9 +4,11 @@ import Chat from "./components/Chat";
 import Feed from "./components/Feed";
 import Navbar from "./components/Navbar";
 
+const username = "first-client";
+
 function App() {
     const socket = useMemo(() => {
-        return new WebSocket("ws://localhost:3000?username=first-client");
+        return new WebSocket(`ws://localhost:3000?username=${username}`);
     }, []);
     /* From Uiverse.io by gharsh11032000 */
     return (
@@ -21,6 +23,7 @@ function App() {
                         socket={socket}
                         chatWithProp="client"
                         isAssignedProp={true}
+                        username={username}
                     />
                 </div>
             </div>

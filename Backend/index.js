@@ -4,14 +4,13 @@ import http from "http";
 import { WebSocketServer } from "ws";
 import receiveMessage from "./scripts/receiveMessage.js";
 import { URL } from "url";
+import socketList from "./scripts/socketList.js";
 
 const clientPort = 5173;
 
 const app = express();
 const server = http.createServer(app);
 const wss = new WebSocketServer({ server });
-
-const socketList = [];
 
 wss.on("connection", (socket, req) => {
     console.log("Someone connected");
@@ -27,6 +26,7 @@ wss.on("connection", (socket, req) => {
     }); // Add the socket to the list
 
     socket.on("message", (data) => {
+        // Event receive message on server
         console.log("received message");
 
         receiveMessage(data.toString(), socketList);

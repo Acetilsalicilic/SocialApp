@@ -1,21 +1,21 @@
-export default async function receiveMessage(data, socketList) {
-    console.log("doing the parse");
+import database from "./database.js";
+import forwardToUser from "./forwardToUser.js";
 
+export default async function receiveMessage(data, socketList) {
     const json = await JSON.parse(data);
 
     if (json.type == "new-message") {
         console.log("new message");
-        console.log(json.message);
 
-        console.log("sending to all");
+        const message = json.message; // extract the message from the incoming data
 
-        socketList.forEach(({ username, socket }) => {
-            socket.send(
-                JSON.stringify({
-                    type: "incoming-message",
-                    message: json.message,
-                })
-            );
-        });
+        // Store the message in the database
+        if (message.from && message.to) {
+            database.push(message);
+        }
+
+        console.log(database);
+
+        forwardToUser(message, message.to);
     }
 }
